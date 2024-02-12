@@ -5,15 +5,17 @@
 #include "geometry.h"
 
 
+// 存储faces信息(vertex , uv , normal)
 struct Face {
     std::vector<int> vertexIndices;
     std::vector<int> texcoordIndices;
+    //normal
 };
 
 class Model {
 private:
     std::vector<Vec3f> verts_;
-    std::vector<Face> faces_;
+    std::vector<Face> faces_; // 每个obj都有三个元素
     std::vector<Vec2f> texcoords_;
 public:
     Model(const char *filename);

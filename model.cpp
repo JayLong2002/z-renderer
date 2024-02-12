@@ -14,7 +14,9 @@ Model::Model(const char *filename) : verts_(), faces_(), texcoords_(){
         std::getline(in, line);
         std::istringstream iss(line.c_str());
         char trash;
+        //根据行的开头字符来决定行的类型（例如顶点、法线、纹理坐标或面）
         if (!line.compare(0, 2, "v ")) {
+            // 解析顶点，是三维坐标
             iss >> trash;
             Vec3f v;
             for (int i=0;i<3;i++) iss >> v[i];
@@ -33,6 +35,7 @@ Model::Model(const char *filename) : verts_(), faces_(), texcoords_(){
                 texIdx--;
                 face.vertexIndices.push_back(idx);
                 face.texcoordIndices.push_back(texIdx);
+                //TODO:trash
             }
             faces_.push_back(face);
         }
@@ -55,6 +58,7 @@ Face Model::face(int idx) {
     return faces_[idx];
 }
 
+// 返回指定索引的顶点,Vec3f
 Vec3f Model::vert(int i) {
     return verts_[i];
 }
