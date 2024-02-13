@@ -16,6 +16,33 @@ const int depth  = 255;
 Vec3f light_dir(0,0,-1);
 Vec3f camera(0,0,3);
 
+Vec3f m2v(Matrix m){
+    return Vec3f(m[0][0]/m[3][0], m[1][0]/m[3][0], m[2][0]/m[3][0]);
+}
+
+// 3d vector 2 == (X,Y,Z,1)
+Matrix v2m(Vec3f v) {
+    Matrix m(4, 1);
+    m[0][0] = v.x;
+    m[1][0] = v.y;
+    m[2][0] = v.z;
+    m[3][0] = 1.f;
+    return m;
+}
+
+// View martix
+Matrix viewport(int x, int y, int w, int h) {
+
+    Matrix m = Matrix::identity(4);
+    m[0][3] = x+w/2.f;
+    m[1][3] = y+h/2.f;
+    m[2][3] = depth/2.f;
+
+    m[0][0] = w/2.f;
+    m[1][1] = h/2.f;
+    m[2][2] = depth/2.f;
+    return m;
+}
 
 void line(int x0, int y0, int x1, int y1, TGAImage& image, TGAColor color) {
 	bool steep = false; //标记当前斜率的绝对值是否大于1
@@ -43,7 +70,7 @@ void line(int x0, int y0, int x1, int y1, TGAImage& image, TGAColor color) {
 }
 
 void line(Vec2i t0,Vec2i t1, TGAImage& image, TGAColor color){
-	line(t0.x,t0.y,t1.x,t1.y,image,color);
+	line(t0[0],t0[1],t1[0],t1[1],image,color);
 }
 
 // compute the barycentric for one point x in triangle t0,t1,t2
@@ -150,7 +177,7 @@ void triangle(Vec3f *pts,Vec2f *textures,const std::unique_ptr<martix>& zbuffer,
 				//对z值进行插值,compute this points z-value
 				
 				for (int i=0; i<3; i++) zvalue += pts[i].z*bc[i];
-				Vec2f uv = bc.x*v0+bc.y*v1+bc.z*v2;
+				Vec2f uv = v0*bc.x+v1*bc.y+v2*bc.z;
 				// get from texture,why 1-uv.y?
 				TGAColor color =getTextureColor(texture,uv.x,1-uv.y) ;
 				if((*zbuffer)[x][y] < zvalue){
@@ -169,6 +196,10 @@ Vec3f world2screen(Vec3f v) {
 
 // impl z-buffer
 int main(int argc, char** argv) {
+	Matrix Projection = Matrix::identity(4);
+    Matrix ViewPort   = viewport(width/8, height/8, width*3/4, height*3/4);
+	Projection[3][2] = -1.f/camera.z;
+
 	TGAImage image(width, height, TGAImage::RGB);
 	model = new Model("./obj/african_head/african_head.obj");
 	TGAImage texture;
@@ -185,7 +216,7 @@ int main(int argc, char** argv) {
         Vec2f tex_coords[3];
         for (int j=0; j<3; j++) {
             world_coords[j]  = model->vert(face.vertexIndices[j]);
-            screen_coords[j] = world2screen(world_coords[j]);
+            screen_coords[j] =  m2v(ViewPort*Projection*v2m(world_coords[j]));
             tex_coords[j] = model->getTexCoord(face.texcoordIndices[j]);
         }
         triangle(screen_coords,tex_coords,z_buffer,image,texture);
