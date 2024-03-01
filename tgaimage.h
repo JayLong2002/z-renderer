@@ -62,6 +62,14 @@ struct TGAColor {
     }
 };
 
+inline TGAColor mix(const TGAColor &color1, const TGAColor &color2, float ratio = 0.5) {
+    unsigned char R = color1.bgra[2] * ratio + color2.bgra[2] * (1 - ratio);
+    unsigned char G = color1.bgra[1] * ratio + color2.bgra[1] * (1 - ratio);
+    unsigned char B = color1.bgra[0] * ratio + color2.bgra[0] * (1 - ratio);
+    unsigned char A = color1.bgra[3]; 
+
+    return TGAColor(R, G, B, A);
+}
 
 class TGAImage {
 protected:
