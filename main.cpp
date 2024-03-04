@@ -11,7 +11,8 @@ const int width  = 800;
 const int height = 800;
 
 Vec3f light_dir(1,1,1);
-Vec3f       eye(0,-1,3);
+// carmer postion
+Vec3f       eye(0.5,1,2);
 Vec3f    center(0,0,0);
 Vec3f        up(0,1,0);
 
@@ -52,6 +53,8 @@ inline void init(){
     light_dir.normalize();
 }
 
+
+
 struct Shader : public IShader {
     Vec3f          varying_intensity; // written by vertex shader, read by fragment shader
     mat<2,3,float> varying_uv;        // same as above    
@@ -84,7 +87,7 @@ int main(int argc, char** argv) {
 
     TGAImage zbuffer(width, height, TGAImage::GRAYSCALE);
 
-    Shader shader;
+    GouraudShader shader;
     // i : 三角形，j：坐标
     for (int i=0; i<model->nfaces(); i++) {
         Vec4f screen_coords[3];

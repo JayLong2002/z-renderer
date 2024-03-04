@@ -82,6 +82,7 @@ Vec3f barycentric(Vec2f A, Vec2f B, Vec2f C, Vec2f P) {
 
 
 
+// 用的是屏幕坐标
 void triangle(Vec4f *pts, IShader &shader, TGAImage &image, TGAImage &zbuffer) {
     // pts 是齐次坐标
     Vec2f bboxmin( std::numeric_limits<float>::max(),  std::numeric_limits<float>::max());
@@ -105,6 +106,22 @@ void triangle(Vec4f *pts, IShader &shader, TGAImage &image, TGAImage &zbuffer) {
             auto p = proj<2>(P);
             // compute the p'barycentric in (pt1,pt2,pt3)
             Vec3f c = barycentric(pt1,pt2,pt3,p);
+
+            // 透视矫正插值
+            // 1. idea 
+            Vec3f c_revised = { 0,0,0 };
+
+            for (int i = 0; i < 3; ++i)
+            {
+                //求α，β，γ,只需要除以pts第四个分量即可
+                c_revised[i] = c[i] / pts[i][3];
+            }
+            float Z_n = 1. / (c_revised[0] + c_revised[1] + c_revised[2]);
+            for (int i = 0; i < 3; ++i)
+            {
+                //求正确透视下插值的系数
+                c_revised[i] *= Z_n;
+            }
 
             // compute the deapth, mix the z value, our camera on the (0,0,-1)
             float z = pts[0][2]*c.x + pts[1][2]*c.y + pts[2][2]*c.z;
