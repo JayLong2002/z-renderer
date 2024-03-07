@@ -46,26 +46,6 @@ void lookat(Vec3f observer, Vec3f target, Vec3f vertical) {
     }
 }
 
-// gaze is look at , position is where the camera, up_direction is up dire
-void lookat_(Vec3f gaze,Vec3f position,Vec3f up_direction)
-{
-    auto g_t = cross(gaze,up_direction).normalize();
-    
-    ModelView = Matrix::identity();
-    for (size_t i = 0; i < 3; i++)
-    {
-        ModelView[0][i] = g_t[i];
-        ModelView[1][i] = up_direction[i];
-        ModelView[2][i] = (-gaze[i]);
-    }
-    for (size_t i = 0; i < 3; i++)
-    {
-        for (size_t j = 0; j < 3; j++)
-        {
-            ModelView[i][3] = (-position[i]) * ModelView[i][j] ; 
-        }
-    }
-}
 
 Vec3f barycentric(Vec2f A, Vec2f B, Vec2f C, Vec2f P) {
     Vec3f s[2];
@@ -122,7 +102,7 @@ void triangle(Vec4f *pts, IShader &shader, TGAImage &image, TGAImage &zbuffer) {
                 //求正确透视下插值的系数
                 c_revised[i] *= Z_n;
             }
-
+            c = c_revised;
             // compute the deapth, mix the z value, our camera on the (0,0,-1)
             float z = pts[0][2]*c.x + pts[1][2]*c.y + pts[2][2]*c.z;
 
@@ -151,6 +131,7 @@ void triangle(Vec4f *pts, IShader &shader, TGAImage &image, TGAImage &zbuffer) {
             bool discard = shader.fragment(c, color);
             
             if (!discard) {
+                // zbuffer
                 zbuffer.set(P.x, P.y, TGAColor(frag_depth));
                 image.set(P.x, P.y, color);
             }

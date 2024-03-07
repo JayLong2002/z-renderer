@@ -7,6 +7,8 @@
 extern Matrix ModelView;
 extern Matrix Viewport;
 extern Matrix Projection;
+// for shadow mapping
+const float depth = 2000.f;
 
 // MSAA ,sample ssnum * ssnum each pixel
 const int ssnum = 2;
@@ -14,7 +16,6 @@ const int ssnum = 2;
 void viewport(int x, int y, int w, int h);
 void projection(float coeff=0.f); // coeff = -1/c
 void lookat(Vec3f eye, Vec3f center, Vec3f up);
-void lookat(Vec3f gaze,Vec3f position,Vec3f up_direction);
 
 struct IShader {
     virtual ~IShader();
