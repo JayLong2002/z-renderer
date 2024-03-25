@@ -1,6 +1,6 @@
 # z-renderer
 ## 效果展示
-![](./png/output.png)
+![](./output.png)
 ## feature
 可编程的gl</br>
 透视矫正插值</br>
